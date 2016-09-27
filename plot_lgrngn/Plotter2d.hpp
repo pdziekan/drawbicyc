@@ -63,6 +63,16 @@ class Plotter_t<2> : public PlotterCommon
     return blitz::safeToReturn(mean + 0);
   }
 
+  auto horizontal_sum(
+    const arr_t &data
+  ) -> decltype(blitz::safeToReturn(blitz::Array<float, 1>() + 0))
+  {
+    auto tmp = blitz::sum(data(blitz::tensor::j, blitz::tensor::i), blitz::tensor::j);
+    blitz::Array<float, 1> mean(tmp);
+    return blitz::safeToReturn(mean + 0);
+  }
+
+
   //ctor
   Plotter_t(const string &file):
     parent_t(file)
