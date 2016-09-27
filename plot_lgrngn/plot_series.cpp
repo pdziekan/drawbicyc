@@ -1,17 +1,8 @@
 #include "common.hpp"
-#include "gnuplot.hpp"
 #include "Plotter3d.hpp"
 #include <boost/tuple/tuple.hpp>
 
 const double D = 3.75e-6; //[1/s], ugly, large-scale horizontal wind divergence TODO: read from model output
-
-using namespace blitz;
-
-double iscloudy(double x)
-{
-  return x > 20. ? 1. : 0.;
-}
-BZ_DECLARE_FUNCTION(iscloudy)
 
 template<class Plotter_t>
 void plot_series(Plotter_t plotter)
