@@ -19,15 +19,28 @@ void plot_series(Plotter_t plotter)
   string prof_file = plotter.file + "_series.dat";
   std::ofstream oprof_file(prof_file);
 
-  Array<float, 1> res_prof(n["t"]);
-  Array<float, 1> res_pos(n["t"]);
-
   // read in density
   auto tmp = plotter.h5load(plotter.file + "/const.h5", "G");
   typename Plotter_t::arr_t rhod(tmp);
   typename Plotter_t::arr_t rtot(rhod.shape());
 
   std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc"});
+
+  // read opts
+  po::options_description opts("profile plotting options");
+  opts.add_options()
+    ("series_start", po::value<int>()->default_value(0) , "time in sec when we start drawin series")
+    ("series_end", po::value<int>()->default_value(0) , "time in sec when we end drawing series")
+  ;
+  po::variables_map vm; 
+  handle_opts(opts, vm);
+
+  int first_timestep =  vm["series_start"].as<int>() / n["dt"] / n["outfreq"];
+  int last_timestep =  vm["series_end"].as<int>() / n["dt"] / n["outfreq"];
+  if(last_timestep == 0) last_timestep = n["t"]-1;
+
+  Array<float, 1> res_prof(last_timestep - first_timestep + 1);
+  Array<float, 1> res_pos(last_timestep - first_timestep + 1);
 
   for (auto &plt : plots)
   {
@@ -38,7 +51,7 @@ void plot_series(Plotter_t plotter)
     std::string row;
     double prec_vol;
 
-    for (int at = 0; at < n["t"]; ++at) // TODO: mark what time does it actually mean!
+    for (int at = first_timestep; at <= last_timestep; ++at) // TODO: mark what time does it actually mean!
     {
       res_pos(at) = at * n["outfreq"] * n["dt"] / 3600.;
       // read in precipitation volume
@@ -218,9 +231,9 @@ void plot_series(Plotter_t plotter)
     else if (plt == "er")
     {
       // forward difference, in cm
-      Range nolast = Range(0, n["t"]-2);
+      Range nolast = Range(0, last_timestep-1);
       res_prof(nolast) = (res_prof(nolast+1) - res_prof(nolast)) * n["dz"] * 1e2 / (n["dt"] * n["outfreq"]) + D * (res_prof(nolast) - 0.5) * n["dz"] * 1e2;
-      res_prof(n["t"]-1) = 0.;
+      res_prof(last_timestep) = 0.;
       gp << "set title 'entrainment rate [cm / s]'\n";
     }
 

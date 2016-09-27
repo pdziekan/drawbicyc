@@ -1,16 +1,5 @@
 #include"plot_series.hpp"
 #include"plot_prof.hpp"
-// command-line option handling
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/parsers.hpp>
-namespace po = boost::program_options;
-
-// some globals for option handling
-int ac;
-char** av; 
-po::options_description opts_main("General options");
-
 
 int main(int argc, char** argv)
 {

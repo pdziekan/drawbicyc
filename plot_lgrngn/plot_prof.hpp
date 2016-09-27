@@ -27,9 +27,18 @@ void plot_profiles(Plotter_t plotter)
 
   int k_i = 0; // inversion cell
 
+  // read opts
+  po::options_description opts("profile plotting options");
+  opts.add_options()
+    ("prof_start", po::value<int>()->required() , "time in sec when we start collecting profiles")
+    ("prof_end", po::value<int>()->required() , "time in sec when we end collecting profiles")
+  ;
+  po::variables_map vm;
+  handle_opts(opts, vm);
+
   // some ugly constants
-  int first_timestep = 3000. / n["dt"] / n["outfreq"];
-  int last_timestep  = 3600. / n["dt"] / n["outfreq"];
+  int first_timestep =  vm["prof_start"].as<int>() / n["dt"] / n["outfreq"];
+  int last_timestep =  vm["prof_end"].as<int>() / n["dt"] / n["outfreq"];
 
   const double p_1000 = 1000.;
   const double L = 2.5e6;
