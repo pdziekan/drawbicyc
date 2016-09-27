@@ -250,12 +250,18 @@ int main(int ac, char** av)
     dir = string(av[1]),
     h5  = dir + "out_lgrngn";
 
-  int n_dims = 3;
+  // detecting input data dimensionality
+  H5::H5File h5f(h5 + "/const.h5", H5F_ACC_RDONLY);
+  H5::DataSet h5d = h5f.openDataSet("G");
+  H5::DataSpace h5s = h5d.getSpace();
+  int NDims = h5s.getSimpleExtentNdims();
 
-  if(n_dims == 2)
+  if(NDims == 2)
     plot_series(Plotter_t<2>(h5));
-  else if(n_dims == 3)
+  else if(NDims == 3)
     plot_series(Plotter_t<3>(h5));
+  else
+    assert(false && "need 2d or 3d input data");
 
 return 0;
 } // main
