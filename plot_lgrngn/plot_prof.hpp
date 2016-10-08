@@ -6,16 +6,28 @@
 template<class Plotter_t>
 void plot_profiles(Plotter_t plotter)
 {
+
+  // read opts
+  po::options_description opts("profile plotting options");
+  opts.add_options()
+    ("prof_start", po::value<int>()->required() , "time in sec when we start collecting profiles")
+    ("prof_end", po::value<int>()->required() , "time in sec when we end collecting profiles")
+  ;
+  po::variables_map vm;
+  handle_opts(opts, vm);
+  std::string prof_start_s = std::to_string(vm["prof_start"].as<int>());
+  std::string prof_end_s = std::to_string(vm["prof_end"].as<int>());
+
   auto& n = plotter.map;
   for(auto elem : n)
   {
      std::cout << elem.first << " " << elem.second << std::endl;
   }
   Gnuplot gp; 
-  string file = plotter.file + "_profiles.svg";
+  string file = plotter.file + "_profiles_" + prof_start_s + "_" + prof_end_s+".svg";
   init_prof(gp, file, 3, 5); 
 
-  string prof_file = plotter.file + "_profiles.dat";
+  string prof_file = plotter.file + "_profiles_" + prof_start_s + "_" + prof_end_s+".dat";
   std::ofstream oprof_file(prof_file);
 
   // read in density
@@ -27,19 +39,10 @@ void plot_profiles(Plotter_t plotter)
 
   int k_i = 0; // inversion cell
 
-  // read opts
-  po::options_description opts("profile plotting options");
-  opts.add_options()
-    ("prof_start", po::value<int>()->required() , "time in sec when we start collecting profiles")
-    ("prof_end", po::value<int>()->required() , "time in sec when we end collecting profiles")
-  ;
-  po::variables_map vm;
-  handle_opts(opts, vm);
-
-  // some ugly constants
   int first_timestep =  vm["prof_start"].as<int>() / n["dt"] / n["outfreq"];
   int last_timestep =  vm["prof_end"].as<int>() / n["dt"] / n["outfreq"];
 
+  // some ugly constants
   const double p_1000 = 1000.;
   const double L = 2.5e6;
   const double R_d = 287.;
