@@ -76,12 +76,12 @@ void plot_series(Plotter_t plotter)
 	// center of mass of cloud droplets
         try
         {
-          auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng000_mom1", at * n["outfreq"]);
+          auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng000_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
           typename Plotter_t::arr_t snap(tmp);
           typename Plotter_t::arr_t snap2(tmp);
           
           snap2 = snap2 * plotter.LastIndex * n["dz"];
-          res_prof(at) = blitz::sum(snap) / blitz::sum(snap2); 
+          res_prof(at) = blitz::sum(snap2) / blitz::sum(snap); 
         }
         catch(...) {;}
       }
