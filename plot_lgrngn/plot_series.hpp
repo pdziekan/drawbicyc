@@ -14,7 +14,7 @@ void plot_series(Plotter_t plotter)
   }
   Gnuplot gp;
   string file = plotter.file + "_series.svg";
-  init_prof(gp, file, 3, 3); 
+  init_prof(gp, file, 3, 4); 
 
   string prof_file = plotter.file + "_series.dat";
   std::ofstream oprof_file(prof_file);
@@ -24,7 +24,7 @@ void plot_series(Plotter_t plotter)
   typename Plotter_t::arr_t rhod(tmp);
   typename Plotter_t::arr_t rtot(rhod.shape());
 
-  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc"});
+  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc", "rc_com"});
 
   // read opts
   po::options_description opts("profile plotting options");
@@ -70,6 +70,20 @@ void plot_series(Plotter_t plotter)
           res_prof(at) = blitz::mean(snap); 
         }
         catch(...){;}
+      }
+      else if (plt == "rc_com")
+      {
+	// center of mass of cloud droplets
+        try
+        {
+          auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng000_mom1", at * n["outfreq"]);
+          typename Plotter_t::arr_t snap(tmp);
+          typename Plotter_t::arr_t snap2(tmp);
+          
+          snap2 = snap2 * plotter.LastIndex * n["dz"];
+          res_prof(at) = blitz::sum(snap) / blitz::sum(snap2); 
+        }
+        catch(...) {;}
       }
       else if (plt == "nc")
       {
@@ -211,6 +225,8 @@ void plot_series(Plotter_t plotter)
 
     if (plt == "clfrac")
       gp << "set title 'average cloud fraction'\n";
+    else if (plt == "rc_com")
+      gp << "set title 'cloud droplets center of mass [m]'\n";
     else if (plt == "nc")
       gp << "set title 'average cloud drop conc [1/cm^3]'\n";
     else if (plt == "cl_nc")
