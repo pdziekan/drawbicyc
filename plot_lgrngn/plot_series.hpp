@@ -24,7 +24,9 @@ void plot_series(Plotter_t plotter)
   typename Plotter_t::arr_t rhod(tmp);
   typename Plotter_t::arr_t rtot(rhod.shape());
 
-  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc", "rc_com"});
+  typename Plotter_t::arr_t res_tmp(rhod.shape());
+
+  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc", "rc_com", "rc_avg"});
 
   // read opts
   po::options_description opts("profile plotting options");
@@ -70,6 +72,23 @@ void plot_series(Plotter_t plotter)
           res_prof(at) = blitz::mean(snap); 
         }
         catch(...){;}
+      }
+      // rc averaged over cells with rc > 1.e-5
+      else if (plt == "rc_avg")
+      {
+        // read rc to res_tmp 
+        
+        auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng000_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
+        typename Plotter_t::arr_t snap(tmp);
+        
+        res_tmp = iscloudy_rc(snap); // find cells with rc>1e-5
+        snap *= res_tmp; // apply filter
+        
+        // mean only over updraught cells
+        if(blitz::sum(res_tmp) > 0.)
+          res_prof(at) = blitz::sum(snap) / blitz::sum(res_tmp); 
+        else
+          res_prof(at) = 0.;
       }
       else if (plt == "rc_com")
       {
@@ -229,9 +248,15 @@ void plot_series(Plotter_t plotter)
     {
       res_prof /= 1000.;
       res_pos *= 60.;
-      gp << "set title 'cloud droplets center of mass [m]'\n";
+      gp << "set ylabel 'r_c center of mass [km]'\n";
       gp << "set xlabel 'time [min]'\n";
-      gp << "set ylabel 'z [km]'\n";
+    }
+    else if (plt == "rc_avg")
+    {
+      res_prof *= 1000.;
+      res_pos *= 60.;
+      gp << "set ylabel 'average r_c  [g/kg]'\n";
+      gp << "set xlabel 'time [min]'\n";
     }
     else if (plt == "nc")
       gp << "set title 'average cloud drop conc [1/cm^3]'\n";

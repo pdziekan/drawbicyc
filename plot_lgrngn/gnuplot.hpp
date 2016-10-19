@@ -15,7 +15,8 @@ void init_prof(
     boost::filesystem::path(file).parent_path()
   );
   gp << "set term svg dynamic enhanced fsize 16 size " << nx * 500 << "," << ny * 500 << "\n";
-  gp << "set size square\n";
+//  gp << "set size square\n";
+//  gp << "set size ratio 0.3\n";
   gp << "set output '" << file << "'\n";
   gp << "set grid\n";
   gp << "set multiplot layout " << ny << "," << nx << "\n";
