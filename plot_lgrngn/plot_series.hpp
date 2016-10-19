@@ -226,7 +226,13 @@ void plot_series(Plotter_t plotter)
     if (plt == "clfrac")
       gp << "set title 'average cloud fraction'\n";
     else if (plt == "rc_com")
+    {
+      res_prof /= 1000.;
+      res_pos *= 60.;
       gp << "set title 'cloud droplets center of mass [m]'\n";
+      gp << "set xlabel 'time [min]'\n";
+      gp << "set ylabel 'z [km]'\n";
+    }
     else if (plt == "nc")
       gp << "set title 'average cloud drop conc [1/cm^3]'\n";
     else if (plt == "cl_nc")
