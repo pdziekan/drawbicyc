@@ -26,7 +26,7 @@ void plot_series(Plotter_t plotter)
 
   typename Plotter_t::arr_t res_tmp(rhod.shape());
 
-  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc", "rc_com", "rc_avg"});
+  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc", "rc_com", "rc_avg", "tot_water"});
 
   // read opts
   po::options_description opts("profile plotting options");
@@ -89,6 +89,25 @@ void plot_series(Plotter_t plotter)
           res_prof(at) = blitz::sum(snap) / blitz::sum(res_tmp); 
         else
           res_prof(at) = 0.;
+      }
+      else if (plt == "tot_water")
+      {
+        try
+        {
+          {
+            auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng002_mom3", at * n["outfreq"]) * 4./3. *3.14159265359 * 1e3;
+            typename Plotter_t::arr_t snap(tmp);
+            snap *= rhod;
+            res_prof(at) = blitz::sum(snap);
+          } 
+          {
+            auto tmp = plotter.h5load_timestep(plotter.file, "rv", at * n["outfreq"]);
+            typename Plotter_t::arr_t snap(tmp);
+            snap *= rhod;
+            res_prof(at) += blitz::sum(snap);
+          } 
+        }
+        catch(...) {;}
       }
       else if (plt == "rc_com")
       {
@@ -250,6 +269,7 @@ void plot_series(Plotter_t plotter)
       res_pos *= 60.;
       gp << "set ylabel 'r_c center of mass [km]'\n";
       gp << "set xlabel 'time [min]'\n";
+      gp << "set title 'center of mass'\n";
     }
     else if (plt == "rc_avg")
     {
@@ -257,7 +277,10 @@ void plot_series(Plotter_t plotter)
       res_pos *= 60.;
       gp << "set ylabel 'average r_c  [g/kg]'\n";
       gp << "set xlabel 'time [min]'\n";
+      gp << "set title 'average rc'\n";
     }
+    else if (plt == "tot_water")
+      gp << "set title 'total water'\n";
     else if (plt == "nc")
       gp << "set title 'average cloud drop conc [1/cm^3]'\n";
     else if (plt == "cl_nc")
