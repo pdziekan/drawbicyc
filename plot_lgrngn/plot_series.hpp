@@ -76,19 +76,23 @@ void plot_series(Plotter_t plotter)
       // rc averaged over cells with rc > 1.e-5
       else if (plt == "rc_avg")
       {
-        // read rc to res_tmp 
-        
-        auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng000_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
-        typename Plotter_t::arr_t snap(tmp);
-        
-        res_tmp = iscloudy_rc(snap); // find cells with rc>1e-5
-        snap *= res_tmp; // apply filter
-        
-        // mean only over updraught cells
-        if(blitz::sum(res_tmp) > 0.)
-          res_prof(at) = blitz::sum(snap) / blitz::sum(res_tmp); 
-        else
-          res_prof(at) = 0.;
+        try
+        {
+          // read rc to res_tmp 
+          auto tmp = plotter.h5load_timestep(plotter.file, "actrw_rw_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
+
+          typename Plotter_t::arr_t snap(tmp);
+          
+          res_tmp = iscloudy_rc(snap); // find cells with rc>1e-5
+          snap *= res_tmp; // apply filter
+          
+          // mean only over updraught cells
+          if(blitz::sum(res_tmp) > 0.)
+            res_prof(at) = blitz::sum(snap) / blitz::sum(res_tmp); 
+          else
+            res_prof(at) = 0.;
+        }
+        catch(...) {;}
       }
       else if (plt == "tot_water")
       {
@@ -114,7 +118,7 @@ void plot_series(Plotter_t plotter)
 	// center of mass of cloud droplets
         try
         {
-          auto tmp = plotter.h5load_timestep(plotter.file, "rw_rng000_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
+          auto tmp = plotter.h5load_timestep(plotter.file, "actrw_rw_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
           typename Plotter_t::arr_t snap(tmp);
           typename Plotter_t::arr_t snap2(tmp);
           
