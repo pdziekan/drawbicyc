@@ -4,6 +4,8 @@
 
 const double D = 3.75e-6; //[1/s], ugly, large-scale horizontal wind divergence TODO: read from model output
 
+const std::set<std::string> plots({/*"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc",*/ "rc_com", "rc_avg"/*, "tot_water"*/});
+
 template<class Plotter_t>
 void plot_series(Plotter_t plotter)
 {
@@ -14,7 +16,9 @@ void plot_series(Plotter_t plotter)
   }
   Gnuplot gp;
   string file = plotter.file + "_series.svg";
-  init_prof(gp, file, 3, 4); 
+  int hor = min<int>(plots.size(), 4);
+  int ver = plots.size() / hor + 0.99999;
+  init_prof(gp, file, ver, hor); 
 
   string prof_file = plotter.file + "_series.dat";
   std::ofstream oprof_file(prof_file);
@@ -26,7 +30,6 @@ void plot_series(Plotter_t plotter)
 
   typename Plotter_t::arr_t res_tmp(rhod.shape());
 
-  std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc", "rc_com", "rc_avg", "tot_water"});
 
   // read opts
   po::options_description opts("profile plotting options");
