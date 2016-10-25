@@ -8,5 +8,5 @@ find_package(Boost COMPONENTS thread iostreams system timer program_options file
 #find_package(Boost COMPONENTS filesystem REQUIRED)
 
 set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
-add_subdirectory(plot_lgrngn)
+add_subdirectory(src)
 
