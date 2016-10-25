@@ -44,12 +44,11 @@ int main(int argc, char** argv)
     if(flag_series)   plot_series(PlotterMicro_t<2>(h5, micro));
     if(flag_profiles) plot_profiles(PlotterMicro_t<2>(h5, micro));
   }
-/*
   else if(NDims == 3)
   {
-    if(flag_series)   plot_series(Plotter_t<3>(h5, micro));
-    if(flag_profiles) plot_profiles(Plotter_t<3>(h5, micro));
-  }*/
+    if(flag_series)   plot_series(PlotterMicro_t<3>(h5, micro));
+    if(flag_profiles) plot_profiles(PlotterMicro_t<3>(h5, micro));
+  }
   else
     assert(false && "need 2d or 3d input data");
 
