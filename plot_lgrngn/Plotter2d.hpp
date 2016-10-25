@@ -1,7 +1,6 @@
 #pragma once
 #include "PlotterCommon.hpp"
 
-
 template<int NDims>
 class Plotter_t : public PlotterCommon {};
 

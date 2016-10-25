@@ -12,6 +12,7 @@ int main(int argc, char** argv)
     ("prof", po::value<bool>()->default_value(true), "plot profiles?")
     ("series", po::value<bool>()->default_value(true) , "plot series?")
     ("dir", po::value<std::string>()->required() , "directory containing out_lgrngn")
+    ("micro", po::value<std::string>()->required(), "one of: blk_1m, blk_2m, lgrngn")
   ;
 
   po::variables_map vm;
@@ -20,10 +21,13 @@ int main(int argc, char** argv)
   // checking if all required options present
   po::notify(vm);
 
+  // handling the "micro" option
+  std::string micro = vm["micro"].as<std::string>();
+
   // parse dir name
   std::string
     dir = vm["dir"].as<std::string>(),
-    h5  = dir + "out_lgrngn";
+    h5  = dir + "out_" + micro;
 
   // reading required plot types
   bool flag_series = vm["series"].as<bool>(),
@@ -37,14 +41,15 @@ int main(int argc, char** argv)
 
   if(NDims == 2)
   {
-    if(flag_series)   plot_series(Plotter_t<2>(h5));
-    if(flag_profiles) plot_profiles(Plotter_t<2>(h5));
+    if(flag_series)   plot_series(PlotterMicro_t<2>(h5, micro));
+    if(flag_profiles) plot_profiles(PlotterMicro_t<2>(h5, micro));
   }
+/*
   else if(NDims == 3)
   {
-    if(flag_series)   plot_series(Plotter_t<3>(h5));
-    if(flag_profiles) plot_profiles(Plotter_t<3>(h5));
-  }
+    if(flag_series)   plot_series(Plotter_t<3>(h5, micro));
+    if(flag_profiles) plot_profiles(Plotter_t<3>(h5, micro));
+  }*/
   else
     assert(false && "need 2d or 3d input data");
 

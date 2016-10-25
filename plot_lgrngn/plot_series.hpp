@@ -1,5 +1,5 @@
 #include "common.hpp"
-#include "Plotter3d.hpp"
+#include "PlotterMicro.hpp"
 #include <boost/tuple/tuple.hpp>
 
 const double D = 3.75e-6; //[1/s], ugly, large-scale horizontal wind divergence TODO: read from model output
@@ -79,7 +79,7 @@ void plot_series(Plotter_t plotter)
         try
         {
           // read rc to res_tmp 
-          auto tmp = plotter.h5load_timestep(plotter.file, "actrw_rw_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
+          auto tmp = plotter.h5load_rc_timestep(plotter.file, at * n["outfreq"]);
 
           typename Plotter_t::arr_t snap(tmp);
           
@@ -118,7 +118,7 @@ void plot_series(Plotter_t plotter)
 	// center of mass of cloud droplets
         try
         {
-          auto tmp = plotter.h5load_timestep(plotter.file, "actrw_rw_mom3", at * n["outfreq"]) * 4./3. * 3.14 * 1e3;
+          auto tmp = plotter.h5load_rc_timestep(plotter.file, at * n["outfreq"]);
           typename Plotter_t::arr_t snap(tmp);
           typename Plotter_t::arr_t snap2(tmp);
           
