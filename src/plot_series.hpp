@@ -4,7 +4,7 @@
 
 const double D = 3.75e-6; //[1/s], ugly, large-scale horizontal wind divergence TODO: read from model output
 
-const std::set<std::string> plots({/*"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc",*/ "rc_com", "rc_avg"/*, "tot_water"*/});
+const std::set<std::string> plots({/*"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc",*/ "rc_com", "rc_avg"/*, "th_com", "tot_water"*/});
 
 template<class Plotter_t>
 void plot_series(Plotter_t plotter)
@@ -126,7 +126,29 @@ void plot_series(Plotter_t plotter)
           typename Plotter_t::arr_t snap2(tmp);
           
           snap2 = snap2 * plotter.LastIndex * n["dz"];
-          res_prof(at) = blitz::sum(snap2) / blitz::sum(snap); 
+          if(blitz::sum(snap) > 1e-3)
+            res_prof(at) = blitz::sum(snap2) / blitz::sum(snap); 
+          else 
+            res_prof(at) = 0.;
+        }
+        catch(...) {;}
+      }
+      else if (plt == "th_com")
+      {
+	// center of mass of temp perturb
+        try
+        {
+          auto tmp = plotter.h5load_timestep(plotter.file, "th", at * n["outfreq"]);
+          typename Plotter_t::arr_t snap(tmp);
+          
+          res_tmp = is_th_prtrb(snap); // find cells with th>300.1
+          snap *= res_tmp; // apply filter
+          res_tmp = snap * plotter.LastIndex * n["dz"];
+          
+          if(blitz::sum(res_tmp) > 0.)
+            res_prof(at) = blitz::sum(res_tmp) / blitz::sum(snap); 
+          else
+            res_prof(at) = 0.;
         }
         catch(...) {;}
       }
@@ -275,6 +297,14 @@ void plot_series(Plotter_t plotter)
       res_prof /= 1000.;
       res_pos *= 60.;
       gp << "set ylabel 'r_c center of mass [km]'\n";
+      gp << "set xlabel 'time [min]'\n";
+      gp << "set title 'center of mass'\n";
+    }
+    else if (plt == "th_com")
+    {
+      res_prof /= 1000.;
+      res_pos *= 60.;
+      gp << "set ylabel 'th prtrb center of mass [km]'\n";
       gp << "set xlabel 'time [min]'\n";
       gp << "set title 'center of mass'\n";
     }

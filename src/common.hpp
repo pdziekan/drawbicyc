@@ -75,6 +75,12 @@ double iscloudy_rc(double x)
 }
 BZ_DECLARE_FUNCTION(iscloudy_rc)
 
+double is_th_prtrb(double x)
+{
+  return x > 300.1 ? 1. : 0.; 
+}
+BZ_DECLARE_FUNCTION(is_th_prtrb)
+
 double iscloudy(double x)
 {
   return x > 20. ? 1. : 0.; 
