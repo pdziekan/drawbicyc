@@ -4,7 +4,7 @@
 
 const double D = 3.75e-6; //[1/s], ugly, large-scale horizontal wind divergence TODO: read from model output
 
-const std::set<std::string> plots({/*"wvarmax", "clfrac", "lwp", "er", "surf_precip", "mass_dry", "acc_precip", "cl_nc",*/ "rc_com", "rc_avg"/*, "th_com", "tot_water"*/});
+const std::set<std::string> plots({"wvarmax", "clfrac", "lwp", "er", "surf_precip"/*, "mass_dry"*/, "acc_precip", "cl_nc", "rc_com", "rc_avg", "th_com", "tot_water"});
 
 template<class Plotter_t>
 void plot_series(Plotter_t plotter)
